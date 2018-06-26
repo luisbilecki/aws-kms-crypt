@@ -4,7 +4,7 @@ const crypto = require('./lib/crypto')
 const nodecrypto = require('crypto')
 
 const AES_IV_BYTES = 16
-const AES_KEY_SPEC = 'AES_128'
+let AES_KEY_SPEC = 'AES_128'
 
 module.exports = {
 
@@ -29,15 +29,22 @@ module.exports = {
    * @param {string} options.key - KMS key ID, ARN, alias or alias ARN
    * @param {string} options.region - AWS region of the key
    * @param {encryptCallback} callback
+   * @param {string} options.awsKeySpec - AWS key spec
    */
   encrypt: (data, options, callback) => {
+    // Update aws key spec
+    let valid_aes_key_specs = ['AES_128', 'AES_256']
+    let aes_key_spec = 'AES_128' || valid_aes_key_specs.includes(
+        options.awsKeySpec.toUpperCase()
+    );
+
     const kms = new AWS.KMS({ region: options.region })
     const iv = nodecrypto.randomBytes(AES_IV_BYTES)
 
     kms.generateDataKey({
       EncryptionContext: options.encryptionContext || {},
       KeyId: options.key,
-      KeySpec: AES_KEY_SPEC
+      KeySpec: aes_key_spec
     }, function (err, res) {
       if (err) {
         return callback(err)

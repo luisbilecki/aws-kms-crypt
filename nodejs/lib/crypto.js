@@ -2,7 +2,6 @@
 
 const crypto = require('crypto')
 
-const AES_CBC_IDENTIFIER = 'aes-128-cbc'
 const AES_IV_BYTES = 16
 const AES_KEY_BYTES = 16
 
@@ -13,10 +12,11 @@ module.exports = {
    * @param {Buffer} message the message to decrypt
    * @param {Buffer} key the key to decrypt the data with
    * @param {Buffer} iv the initialization vector to use
+   * @param {string} aes_identifier the aes identifier (aes_128 ...)
    * @return {string} the decrypt message as string
    * @throws {Error} if decryption fails or input is invalid
    */
-  decrypt: (message, key, iv) => {
+  decrypt: (message, key, iv, aes_identifier) => {
     // Validate the key and iv
     module.exports.validateKeyAndIv(key, iv)
 
@@ -26,7 +26,7 @@ module.exports = {
     }
 
     // Decrypt the message
-    const cipher = crypto.createDecipheriv(AES_CBC_IDENTIFIER, key, iv)
+    const cipher = crypto.createDecipheriv(aes_identifier, key, iv)
     return cipher.update(message, undefined, 'utf8') + cipher.final('utf8')
   },
 
@@ -36,10 +36,11 @@ module.exports = {
    * @param {Buffer} message the message to encrypt
    * @param {Buffer} key the key to encrypt the data with
    * @param {Buffer} iv the initialization vector to use
+   * @param {string} aes_identifier the aes identifier (aes_128 ...)
    * @return {string} the encrypted message as base64 encoded string
    * @throws {Error} if encryption fails or input is invalid
    */
-  encrypt: (message, key, iv) => {
+  encrypt: (message, key, iv, aes_identifier) => {
     // Validate the key and iv
     module.exports.validateKeyAndIv(key, iv)
 
@@ -49,7 +50,7 @@ module.exports = {
     }
 
     // Encrypt the message
-    const cipher = crypto.createCipheriv(AES_CBC_IDENTIFIER, key, iv)
+    const cipher = crypto.createCipheriv(aes_identifier, key, iv)
     return cipher.update(message, 'utf-8', 'base64') + cipher.final('base64')
   },
 
